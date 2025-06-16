@@ -253,10 +253,10 @@ def load_visual_text_model(
                 )
             except ValueError:
                 from_pretrained_kwargs = {}
-                if config.model_type == "phi4mm":
-                    if "activation_checkpointing" in config.audio_processor["config"]:
+                if config.model_type in ["phi4mm", "phi3_v"]:
+                    if config.model_type == "phi4mm" and "activation_checkpointing" in config.audio_processor["config"]:
                         config.audio_processor["config"]["activation_checkpointing"] = ""
-                    config._attn_implementation = "sdpa"
+                    config._attn_implementation = "sdpa" if config.model_type == "phi4mm" else "eager"
                     from_pretrained_kwargs["config"] = config
 
                 model = AutoModelForCausalLM.from_pretrained(
