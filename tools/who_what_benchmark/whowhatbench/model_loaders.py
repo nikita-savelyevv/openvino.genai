@@ -111,7 +111,7 @@ def load_text_hf_pipeline(model_id, device):
 
 
 def load_text_model(
-    model_id, device="CPU", ov_config=None, use_hf=False, use_genai=False, use_llamacpp=False, **kwargs,
+    model_id, device="CPU", ov_config=None, use_hf=False, use_genai=False, use_llamacpp=False, use_onnx=False, **kwargs,
 ):
     if use_hf:
         logger.info("Using HF Transformers API")
@@ -126,7 +126,7 @@ def load_text_model(
         from optimum.intel.openvino import OVModelForCausalLM
         try:
             model = OVModelForCausalLM.from_pretrained(
-                model_id, trust_remote_code=True, device=device, ov_config=ov_config
+                model_id, trust_remote_code=True, device=device, ov_config=ov_config, from_onnx=use_onnx,
             )
         except Exception:
             try:
@@ -139,6 +139,7 @@ def load_text_model(
                     use_cache=True,
                     device=device,
                     ov_config=ov_config,
+                    from_onnx=use_onnx,
                 )
             except Exception:
                 config = AutoConfig.from_pretrained(model_id)
@@ -148,6 +149,7 @@ def load_text_model(
                     use_cache=True,
                     device=device,
                     ov_config=ov_config,
+                    from_onnx=use_onnx,
                 )
 
     return model
@@ -366,7 +368,7 @@ def load_inpainting_model(
 
 
 def load_model(
-    model_type, model_id, device="CPU", ov_config=None, use_hf=False, use_genai=False, use_llamacpp=False, **kwargs
+    model_type, model_id, device="CPU", ov_config=None, use_hf=False, use_genai=False, use_llamacpp=False, use_onnx=False, **kwargs
 ):
     if model_id is None:
         return None
@@ -378,7 +380,7 @@ def load_model(
         ov_options = {}
 
     if model_type == "text":
-        return load_text_model(model_id, device, ov_options, use_hf, use_genai, use_llamacpp, **kwargs)
+        return load_text_model(model_id, device, ov_options, use_hf, use_genai, use_llamacpp, use_onnx, **kwargs)
     elif model_type == "text-to-image":
         return load_text2image_model(
             model_id, device, ov_options, use_hf, use_genai

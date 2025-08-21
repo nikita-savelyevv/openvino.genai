@@ -173,6 +173,11 @@ def parse_args():
         default=42,
         help="Text-to-image specific parameter that defines the seed value.",
     )
+    parser.add_argument(
+        "--onnx",
+        action="store_true",
+        help="Load model from ONNX file instead of PyTorch or OpenVINO.",
+    )
 
     return parser.parse_args()
 
@@ -515,6 +520,7 @@ def main():
             args.ov_config,
             args.hf,
             args.genai,
+            args.onnx,
             **kwargs,
         )
         evaluator = create_evaluator(base_model, args)
@@ -539,6 +545,7 @@ def main():
                 args.hf,
                 args.genai,
                 args.llamacpp,
+                args.onnx,
                 **kwargs
             )
             all_metrics_per_question, all_metrics = evaluator.score(
